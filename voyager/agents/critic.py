@@ -76,17 +76,35 @@ class CriticAgent:
         print(f"\033[31m****Critic Agent human message****\n{observation}\033[0m")
         return HumanMessage(content=observation)
 
-    def human_check_task_success(self):
-        confirmed = False
-        success = False
-        critique = ""
-        while not confirmed:
+    def human_check_task_success(self, messages, max_retries=5):
+        if max_retries == 0:
+            print(
+                "\033[31mFailed to parse Critic Agent response. Consider updating your prompt.\033[0m"
+            )
+            return False, ""
+        if messages[1] is None:
+            return False, ""
+        critic = self.llm(messages).content
+        print(f"\033[31m****Critic Agent ai message****\n{critic}\033[0m")
+        confirmed = input("Confirm? (y/n)") in ["y", ""]
+        if not confirmed:
             success = input("Success? (y/n)")
             success = success.lower() == "y"
             critique = input("Enter your critique:")
-            print(f"Success: {success}\nCritique: {critique}")
-            confirmed = input("Confirm? (y/n)") in ["y", ""]
-        return success, critique
+            return success, critique
+        else:
+            try:
+                response = fix_and_parse_json(critic)
+                assert response["success"] in [True, False]
+                if "critique" not in response:
+                    response["critique"] = ""
+                return response["success"], response["critique"]
+            except Exception as e:
+                print(f"\033[31mError parsing critic response: {e} Trying again!\033[0m")
+                return self.human_check_task_success(
+                    messages=messages,
+                    max_retries=max_retries - 1,
+                )
 
     def ai_check_task_success(self, messages, max_retries=5):
         if max_retries == 0:
@@ -129,7 +147,9 @@ class CriticAgent:
         ]
 
         if self.mode == "manual":
-            return self.human_check_task_success()
+            return self.human_check_task_success(
+                messages=messages, max_retries=max_retries
+            )
         elif self.mode == "auto":
             return self.ai_check_task_success(
                 messages=messages, max_retries=max_retries

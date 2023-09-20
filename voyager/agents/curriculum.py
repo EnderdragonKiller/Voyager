@@ -238,7 +238,7 @@ class CurriculumAgent:
         return HumanMessage(content=content)
 
     def propose_next_task(self, *, events, chest_observation, max_retries=5):
-        if self.progress == 0 and self.mode == "auto":
+        if self.progress == 0:
             task = "Mine 1 wood log"
             context = "You can mine one of oak, birch, spruce, jungle, acacia, dark oak, or mangrove logs."
             return task, context
@@ -285,7 +285,7 @@ class CurriculumAgent:
         if self.mode == "auto":
             return self.propose_next_ai_task(messages=messages, max_retries=max_retries)
         elif self.mode == "manual":
-            return self.propose_next_manual_task()
+            return self.propose_next_manual_task(messages=messages, max_retries=max_retries)
         else:
             raise ValueError(f"Invalid curriculum agent mode: {self.mode}")
 
@@ -316,14 +316,30 @@ class CurriculumAgent:
         assert task, "Task not found in Curriculum Agent response"
         return {"next_task": task}
 
-    def propose_next_manual_task(self):
-        confirmed = False
-        task, context = "", ""
-        while not confirmed:
+    def propose_next_manual_task(self, *, messages, max_retries=5):
+        curriculum = self.llm(messages).content
+        print(f"\033[31m****Curriculum Agent ai message****\n{curriculum}\033[0m")
+        try:
+            response = self.parse_ai_message(curriculum)
+            assert "next_task" in response
+        except Exception as e:
+            print(
+                f"\033[35mError parsing curriculum response: {e}. Trying again!\033[0m"
+            )
+            return self.propose_next_manual_task(
+                messages=messages,
+                max_retries=max_retries - 1,
+            )
+        confirmed = input("Confirm? (y/n)").lower() in ["y", ""]
+        if not confirmed:
             task = input("Enter task: ")
-            context = input("Enter context: ")
-            print(f"Task: {task}\nContext: {context}")
-            confirmed = input("Confirm? (y/n)").lower() in ["y", ""]
+            context = self.get_task_context(task)
+        else:
+            task = response["next_task"]
+            context = self.get_task_context(response["next_task"])
+        confirmed = input("Confirm? (y/n)").lower() in ["y", ""]
+        if not confirmed:
+            context = input("Enter fixed context: ")
         return task, context
 
     def update_exploration_progress(self, info):
