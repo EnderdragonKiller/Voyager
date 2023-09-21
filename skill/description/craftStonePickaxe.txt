@@ -1,0 +1,3 @@
+async function craftStonePickaxe(bot) {
+    // The function is about crafting a stone pickaxe. First, it checks if the player already has a stone pickaxe, and if so, it returns. If not, it checks if the player has enough cobblestones. If not, it mines the required number of cobblestones. Then, it checks if the player has enough sticks. If not, it mines an oak log and crafts the required number of sticks. Next, it checks if there is a crafting table nearby. If not, it places a crafting table near the player. Finally, it crafts the stone pickaxe and notifies the player.
+}

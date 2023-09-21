@@ -1,0 +1,3 @@
+async function mineDiamondOre(bot) {
+    // The function is about mining a specific number of diamond ore blocks using either an iron or diamond pickaxe. First, it checks if there is already enough diamond ore in the inventory. If so, it returns. Then, it checks if there is an iron or diamond pickaxe in the inventory. If not, it returns. Next, it uses the `exploreUntil` function to search for diamond ore blocks in the environment. Once a diamond ore block is found, it mines the specified number of diamond ore blocks. Finally, it sends a chat message indicating that the task is complete.
+}

@@ -1,0 +1,3 @@
+async function craftIronPickaxe(bot) {
+    // The function is about crafting an iron pickaxe. First, it checks if the player already has an iron pickaxe, and if so, it returns. If not, it checks if the player has enough iron ingots. If not, it mines iron ore and smelts it into iron ingots. Then, it checks if the player has enough sticks. If not, it mines oak logs and crafts sticks. Next, it checks if the player has a crafting table in their inventory. If not, it crafts one. After that, it places the crafting table near the player's current position. Finally, it crafts the iron pickaxe and sends a chat message indicating that the pickaxe has been crafted.
+}

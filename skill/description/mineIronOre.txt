@@ -1,0 +1,3 @@
+async function mineIronOre(bot) {
+    // The function is about mining 3 iron ore blocks. First, it checks if there is already enough iron ore in the inventory. If so, it returns. If not, it checks if there are torches in the inventory. If not, it crafts torches using coal and sticks. Then, it uses the `exploreUntil` function to find an iron ore vein. Once an iron ore vein is found, it mines iron ore blocks until there are enough. Finally, it sends a chat message indicating that 3 iron ore blocks have been mined.
+}
